@@ -1,6 +1,5 @@
 package com.example.flightapplication.data.dao
 
-import com.example.flightapplication.model.Airport
 import com.example.flightapplication.model.Favorite
 import com.example.flightapplication.model.IataAndName
 import kotlinx.coroutines.flow.Flow

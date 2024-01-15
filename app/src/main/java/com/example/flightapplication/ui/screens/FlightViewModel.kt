@@ -77,7 +77,7 @@ class FlightViewModel(
     fun retrievePossibleFlights(selectedAirport: IataAndName): Flow<List<IataAndName>> =
         flightRepository.getPossibleFlights(selectedAirport.iataCode, selectedAirport.name)
 
-    fun updateFlightSavedState(favorite: Favorite, newState: Boolean) {
+    private fun updateFlightSavedState(favorite: Favorite, newState: Boolean) {
         _uiState.update {
             it.copy(
                 flightSavedStates = _uiState.value.flightSavedStates.toMutableMap().apply {

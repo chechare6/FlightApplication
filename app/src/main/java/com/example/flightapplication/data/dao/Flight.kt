@@ -4,7 +4,6 @@ import androidx.room.Entity
 
 @Entity(tableName = "airport")
 data class Flight(
-
     val id: Int = 0,
     val departureCode: String ="",
     val departureName: String="",
