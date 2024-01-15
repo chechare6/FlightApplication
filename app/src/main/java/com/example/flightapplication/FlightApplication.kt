@@ -3,7 +3,11 @@ package com.example.flightapplication
 import android.app.Application
 import android.content.Context
 import androidx.datastore.core.DataStore
-import java.util.prefs.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.preferences.core.Preferences
+import com.example.flightapplication.data.dao.AppContainer
+import com.example.flightapplication.data.dao.AppDataContainer
+import com.example.flightapplication.data.dao.UserPreferencesRepository
 
 private const val USER_INPUT = "user_input"
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
