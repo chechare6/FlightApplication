@@ -6,6 +6,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.text.*
@@ -50,6 +51,7 @@ fun FlightApp(
     val airportList by viewModel.retrieveAutocompleteSuggestions().collectAsState(emptyList())
     val destinationAirports by viewModel.retrievePossibleFlights(uiState.selectedAirport).collectAsState(emptyList())
     val favoriteFlights by viewModel.getAllFavorites().collectAsState(emptyList())
+
     val focusManager = LocalFocusManager.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -58,20 +60,19 @@ fun FlightApp(
         modifier = modifier
             .padding(dimensionResource(R.dimen.main_box_padding))
             .clickable(
-                //interactionSource = MutableInteractionSource(),
-                //indication = null
-            ) {
-                focusManager.clearFocus()
-            }
+                interactionSource = MutableInteractionSource(),
+                indication = null
+            ) { focusManager.clearFocus() }
     ) {
         Column {
             SearchBar(
                 placeholder = R.string.search_bar_placeholder,
                 value = uiState.userInput,
                 onValueChange = { viewModel.updateUserInput(it)},
-                onClearClick = { viewModel.onClearClick()},
+                onClearClick = { viewModel.onClearClick() },
                 modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.main_column_spacer)))
             AnimatedVisibility(uiState.userInput.isNotBlank() && !uiState.isAirportSelected) {
                 AutocompleteSuggestions(
@@ -81,16 +82,17 @@ fun FlightApp(
                             viewModel.retrievePossibleFlights(it).collect { list ->
                                 val flightList: List<IataAndName> = list
                                 viewModel.updateSelectedAirport(it)
+                                viewModel.syncFavoritesWithFlights(favoriteFlights, it, flightList)
                             }
                         }
                     },
-                    modifier = if (airportList.isNotEmpty())
+                    modifier = if(airportList.isNotEmpty())
                         Modifier
                             .animateEnterExit(
                                 enter = expandVertically(),
                                 exit = shrinkVertically()
                             )
-                            .padding(bottom = dimensionResource(R.dimen.autocomplete_suggestions_bottom_padding))
+                            .padding(dimensionResource(R.dimen.autocomplete_suggestions_bottom_padding))
                     else
                         Modifier
                 )
@@ -101,14 +103,14 @@ fun FlightApp(
                     selectedAirport = uiState.selectedAirport,
                     destinationAirports = destinationAirports,
                     saveFavorite = {
-                        coroutineScope.launch {
-                            viewModel.insertItem(it)
-                        }
+                                   coroutineScope.launch {
+                                       viewModel.insertItem(it)
+                                   }
                     },
                     deleteFavorite = {
-                        coroutineScope.launch {
-                            viewModel.deleteItem(it)
-                        }
+                                     coroutineScope.launch {
+                                         viewModel.deleteItem(it)
+                                     }
                     },
                     isFlightSaved = { viewModel.isFlightSaved(it) },
                     modifier = Modifier.animateEnterExit(
@@ -124,7 +126,7 @@ fun FlightApp(
                 onClearAllClick = { viewModel.toggleDeleteDialogVisibility() }
             )
 
-            if (uiState.isDeleteDialogVisible) {
+            if(uiState.isDeleteDialogVisible) {
                 DeleteConfirmationDialog(
                     onDeleteConfirm = {
                         viewModel.toggleDeleteDialogVisibility()
